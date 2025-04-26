@@ -7,7 +7,7 @@ namespace BACKENDD.Data
     {
         public static void Initialize(AppDbContext context)
         {
-            // Проверяем, пуста ли таблица Contacts
+            // Пusto or no
             if (context.Contacts.Any())
                 return;
 
