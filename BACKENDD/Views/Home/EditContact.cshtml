@@ -1,0 +1,94 @@
+﻿@model BACKENDD.Models.Contact
+@{
+    ViewData["Title"] = "Редактирование контакта";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="EditContact" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SecName"></label>
+        <input asp-for="SecName" class="form-control" />
+        <span asp-validation-for="SecName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Age"></label>
+        <input asp-for="Age" class="form-control" />
+        <span asp-validation-for="Age" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Message"></label>
+        <textarea asp-for="Message" class="form-control"></textarea>
+        <span asp-validation-for="Message" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DepartmentId">Отдел</label>
+        <select asp-for="DepartmentId" class="form-control"
+                asp-items="@(new SelectList(ViewBag.Departments, "Id", "Name", Model.DepartmentId))">
+            <option value="">-- Выберите отдел --</option>
+        </select>
+        <span asp-validation-for="DepartmentId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ContactTypeId">Тип контакта</label>
+        <select asp-for="ContactTypeId" class="form-control"
+                asp-items="@(new SelectList(ViewBag.ContactTypes, "Id", "TypeName", Model.ContactTypeId))">
+            <option value="">-- Выберите тип --</option>
+        </select>
+        <span asp-validation-for="ContactTypeId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="ShowContacts" class="btn btn-secondary">Отмена</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            $('#editForm').on('submit', function(e) {
+                e.preventDefault();
+                console.log("Форма отправлена");
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        } else {
+                            // Если сервер вернул HTML (например, при ошибке валидации)
+                            $('body').html(response);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error("Ошибка", xhr.responseText);
+                        alert('Ошибка при сохранении');
+                    }
+                });
+            });
+        });
+    </script>
+}

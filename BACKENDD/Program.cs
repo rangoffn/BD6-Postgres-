@@ -54,8 +54,8 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "showcontacts",
-    pattern: "Contact/ShowContacts",
-    defaults: new { controller = "Contact", action = "ShowContacts" });
+    pattern: "Home/ShowContacts",
+    defaults: new { controller = "Home", action = "ShowContacts" });
 
 app.MapControllerRoute(
     name: "default",

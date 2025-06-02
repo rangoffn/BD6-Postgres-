@@ -1,13 +1,17 @@
-﻿// Models/IContactService.cs
+﻿// IContactService.cs
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BACKENDD.Models;
 
 namespace BACKENDD.Models
 {
     public interface IContactService
     {
-        Task<bool> SaveContactAsync(Contact contact);  // Сохранение контакта
-        List<Contact> GetAllContacts();  // Получение всех сохраненных контактов
+        Task<bool> SaveContactAsync(Contact contact);
+        List<Contact> GetAllContacts();
+        Task<Contact> GetContactByIdAsync(int id);
+        Task<bool> UpdateContactAsync(Contact contact);
+        Task<bool> DeleteContactAsync(int id);
+        List<Department> GetAllDepartments();
+        List<ContactType> GetAllContactTypes();
     }
 }
