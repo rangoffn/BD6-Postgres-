@@ -1,0 +1,30 @@
+﻿@model List<BACKENDD.Models.Contact>
+
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>Фамилия</th>
+                <th>Отдел</th>
+                <th>Тип</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in Model)
+            {
+                <tr>
+                    <td>@contact.Name</td>
+                    <td>@contact.SecName</td>
+                    <td>@(contact.Department?.Name ?? "Не указан")</td>
+                    <td>@(contact.ContactType?.TypeName ?? "Не указан")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Нет сохраненных контактов</p>
+}

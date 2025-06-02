@@ -1,57 +1,222 @@
-﻿@model Contact
+﻿@model BACKENDD.Models.Contact
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Обратная связь";
 }
 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.5">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <style>
+        .contact-card {
+            transition: all 0.3s ease;
+        }
+
+            .contact-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+
+        #recentContacts {
+            margin-top: 30px;
+            animation: fadeIn 1s;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1 class="display-4">Обратная связь</h1>
-    <img src ="~/images/cry.png" />
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow contact-card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0 text-center">Форма обратной связи</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="contactForm" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="font-weight-bold"></label>
+                                        <input asp-for="Name" class="form-control" placeholder="Введите ваше имя" />
+                                        <span asp-validation-for="Name" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="SecName" class="font-weight-bold"></label>
+                                        <input asp-for="SecName" class="form-control" placeholder="Введите вашу фамилию" />
+                                        <span asp-validation-for="SecName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
 
-    <form method="post" asp-controller="Home" asp-action="Check">
-        <div class="form-group">
-            <label asp-for="Name"></label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Age" class="font-weight-bold"></label>
+                                        <input asp-for="Age" class="form-control" placeholder="Введите ваш возраст" />
+                                        <span asp-validation-for="Age" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="font-weight-bold"></label>
+                                        <input asp-for="Email" class="form-control" placeholder="Введите ваш email" />
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Message" class="font-weight-bold"></label>
+                                <textarea asp-for="Message" class="form-control" rows="4" placeholder="Введите ваше сообщение"></textarea>
+                                <span asp-validation-for="Message" class="text-danger small"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="DepartmentId" class="font-weight-bold">Отдел</label>
+                                        <select asp-for="DepartmentId" class="form-control"
+                                                asp-items="@(new SelectList(ViewBag.Departments, "Id", "Name"))">
+                                            <option value="">Выберите отдел</option>
+                                        </select>
+                                        <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="ContactTypeId" class="font-weight-bold">Тип контакта</label>
+                                        <select asp-for="ContactTypeId" class="form-control"
+                                                asp-items="@(new SelectList(ViewBag.ContactTypes, "Id", "TypeName"))">
+                                            <option value="">Выберите тип</option>
+                                        </select>
+                                        <span asp-validation-for="ContactTypeId" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="fas fa-paper-plane mr-2"></i>Отправить
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="successAlert" class="alert alert-success alert-dismissible fade show mt-3" style="display:none;">
+                            <strong>Успех!</strong> Контакт успешно сохранен.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div id="errorAlert" class="alert alert-danger alert-dismissible fade show mt-3" style="display:none;">
+                            <strong>Ошибка!</strong> <span id="errorMessage"></span>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="recentContacts" class="card shadow mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="mb-0 text-center">Последние контакты</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="contactsList" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Загрузка...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label asp-for="SecName"></label>
-            <input asp-for="SecName" class="form-control" />
-            <span asp-validation-for="SecName" class="text-danger"></span>
-        </div>
+    @section Scripts {
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-        <div class="form-group">
-            <label asp-for="Age"></label>
-            <input asp-for="Age" class="form-control" />
-            <span asp-validation-for="Age" class="text-danger"></span>
-        </div>
+        <script>
+            $(document).ready(function() {
+                // Загружаем последние контакты при загрузке страницы
+                loadRecentContacts();
 
-        <div class="form-group">
-            <label asp-for="Email"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
+                // Обработка отправки формы
+                $('#contactForm').on('submit', function(e) {
+                    e.preventDefault();
 
-        <div class="form-group">
-            <label asp-for="Message"></label>
-            <input asp-for="Message" class="form-control"/>
-            <span asp-validation-for="Message" class="text-danger"></span>
-        </div>
+                    if ($(this).valid()) {
+                        $.ajax({
+                            url: '@Url.Action("Check", "Home")',
+                            type: 'POST',
+                            data: $(this).serialize(),
+                            beforeSend: function() {
+                                $('#contactForm button[type="submit"]').prop('disabled', true);
+                                $('#contactForm button[type="submit"]').html('<i class="fas fa-spinner fa-spin mr-2"></i>Отправка...');
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    $('#successAlert').fadeIn();
+                                    setTimeout(function() {
+                                        $('#successAlert').fadeOut();
+                                    }, 5000);
 
-        <input type="submit" value="Отправить" class="btn btn-primary" />
-    </form>
+                                    $('#contactForm')[0].reset();
+                                    loadRecentContacts();
+                                } else {
+                                    $('#errorMessage').text(response.message || 'Произошла ошибка при сохранении');
+                                    $('#errorAlert').fadeIn();
+                                }
+                            },
+                            error: function(xhr) {
+                                $('#errorMessage').text('Ошибка сервера: ' + xhr.statusText);
+                                $('#errorAlert').fadeIn();
+                            },
+                            complete: function() {
+                                $('#contactForm button[type="submit"]').prop('disabled', false);
+                                $('#contactForm button[type="submit"]').html('<i class="fas fa-paper-plane mr-2"></i>Отправить');
+                            }
+                        });
+                    }
+                });
+            });
 
+            function loadRecentContacts() {
+                $.ajax({
+                    url: '@Url.Action("GetRecentContacts", "Home")',
+                    type: 'GET',
+                    success: function(data) {
+                        $('#contactsList').html(data);
+                    },
+                    error: function() {
+                        $('#contactsList').html('<div class="alert alert-danger">Не удалось загрузить контакты</div>');
+                    }
+                });
+            }
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+            // Автоматическое обновление списка каждые 30 секунд
+            setInterval(loadRecentContacts, 30000);
+        </script>
+    }
 </body>
 </html>

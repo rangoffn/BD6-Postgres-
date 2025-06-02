@@ -1,20 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// ContactController.cs
 using BACKENDD.Models;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 
 public class ContactController : Controller
 {
-    private readonly AppDbContext _context;
+    private readonly IContactService _contactService;
 
-    public ContactController(AppDbContext context)
+    public ContactController(IContactService contactService)
     {
-        _context = context;
+        _contactService = contactService;
     }
 
-    // Метод для получения всех контактов
-    public IActionResult Index()
+    public IActionResult ShowContacts()
     {
-        var contacts = _context.Contacts.ToList();  // Получаем все контакты из базы
-        return View(contacts);  // Отправляем данные в представление
+        var contacts = _contactService.GetAllContacts();
+        return View(contacts);
     }
 }
