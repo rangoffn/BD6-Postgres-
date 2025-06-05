@@ -1,7 +1,9 @@
 ﻿using BACKENDD.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
 {
     private readonly IConfiguration _configuration;
 

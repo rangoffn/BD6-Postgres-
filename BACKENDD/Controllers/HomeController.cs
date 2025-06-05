@@ -1,8 +1,10 @@
 using BACKENDD.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BACKENDD.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IContactService _contactService;
@@ -11,21 +13,23 @@ namespace BACKENDD.Controllers
         {
             _contactService = contactService;
         }
-
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View();
         }
+        [AllowAnonymous]
         public IActionResult NewTABBB()
         {
             return View();
         }
+        [AllowAnonymous]
         public IActionResult Privacy()
         {
             return View();
         }
 
-        // ќбработка формы и сохранение контакта
+        [Authorize(Roles = "Admin,User")]
         [HttpPost]
         public async Task<IActionResult> Check(Contact contact)
         {
@@ -46,7 +50,7 @@ namespace BACKENDD.Controllers
             return View("Index");
         }
 
-        // ћетод дл€ отображени€ всех сохраненных контактов
+        [Authorize(Roles = "Admin,User")]
         public IActionResult ShowContacts()
         {
             var contacts = _contactService.GetAllContacts();  // ѕолучаем все контакты

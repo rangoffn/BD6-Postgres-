@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BACKENDD.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
+
+[Authorize(Roles = "Admin,User")]
 public class ContactController : Controller
 {
     private readonly AppDbContext _context;
