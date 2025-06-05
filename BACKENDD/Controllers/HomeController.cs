@@ -1,8 +1,11 @@
 using BACKENDD.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
+
 
 namespace BACKENDD.Controllers
 {
+    [EnableCors("AllowAll")]
     public class HomeController : Controller
     {
         private readonly IContactService _contactService;

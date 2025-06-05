@@ -5,6 +5,19 @@ using Microsoft.Extensions.FileProviders;
 using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 // Загружаем конфигурацию из файлов в зависимости от среды
 builder.Configuration
@@ -50,6 +63,8 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+app.UseCors("AllowAll"); //////////////////////////////////////////////////////////////////////
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
