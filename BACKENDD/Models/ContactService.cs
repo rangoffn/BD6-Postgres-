@@ -1,31 +1,34 @@
 ﻿using BACKENDD.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Metrics;
+using Prometheus;
 
-namespace BACKENDD.Models
+public class ContactService : IContactService
 {
-    public class ContactService : IContactService
+    private readonly AppDbContext _context;
+    private readonly TelemetryClient _telemetryClient;
+
+    public ContactService(AppDbContext context, TelemetryClient telemetryClient)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+        _telemetryClient = telemetryClient;
+    }
 
-        public ContactService(AppDbContext context)
+    public async Task<bool> SaveContactAsync(Contact contact)
+    {
+        using (AppMetrics.ContactSaveDuration.NewTimer())
         {
-            _context = context;
+            _context.Contacts.Add(contact);
+            await _context.SaveChangesAsync();
+            AppMetrics.ContactsSaved.Inc();
+            return true;
         }
+    }
 
-        // Метод для сохранения контакта
-        public async Task<bool> SaveContactAsync(Contact contact)
-        {
-            _context.Contacts.Add(contact); 
-            await _context.SaveChangesAsync(); 
-            return true;  
-        }
-
-        
-        public List<Contact> GetAllContacts()
-        {
-            return _context.Contacts.OrderBy(c => c.Id).ToList(); 
-        }
+    public List<Contact> GetAllContacts()
+    {
+        var count = _context.Contacts.Count();
+        AppMetrics.ActiveContacts.Set(count);
+        return _context.Contacts.OrderBy(c => c.Id).ToList();
     }
 }
