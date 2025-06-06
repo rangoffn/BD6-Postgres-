@@ -11,8 +11,13 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();  // Добавляем переменные среды
-
-// Регистрируем сервисы и конфигурацию
+builder.Services.AddResponseCaching();
+builder.Services.AddMemoryCache();  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "SampleInstance_";
+}); 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
@@ -39,6 +44,7 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+app.UseResponseCaching();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -1,23 +1,51 @@
 using BACKENDD.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json;
 
 namespace BACKENDD.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IContactService _contactService;
+        private readonly IMemoryCache _memoryCache;
 
-        public HomeController(IContactService contactService)
+
+        public HomeController(
+            IContactService contactService,
+            IMemoryCache memoryCache = null) 
         {
             _contactService = contactService;
+            _memoryCache = memoryCache;
+            
         }
+
+
 
         public IActionResult Index()
         {
+            const string cacheKey = "contacts_cache_key";
+
+            // Пытаемся получить данные из кэша
+            if (!_memoryCache.TryGetValue(cacheKey, out List<Contact> contacts))
+            {
+                // Если данных нет в кэше, загружаем их из базы
+                contacts = _contactService.GetAllContacts();
+
+                // Настраиваем параметры кэширования (время жизни 5 минут)
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+
+                _memoryCache.Set(cacheKey, contacts, cacheOptions);
+            }
+
             return View();
         }
         public IActionResult NewTABBB()
+
         {
+  
             return View();
         }
         public IActionResult Privacy()
